@@ -2,8 +2,8 @@ package mounderfod.moundertweaks.impl;
 
 import me.sargunvohra.mcmods.autoconfig1u.AutoConfig;
 import me.sargunvohra.mcmods.autoconfig1u.serializer.JanksonConfigSerializer;
+import mounderfod.moundertweaks.impl.serialization.deserialization.Deserializer;
 import mounderfod.moundertweaks.util.config.MounderTweaksConfig;
-import net.szum123321.tool_action_helper.api.ShovelPathHelper;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -20,7 +20,6 @@ import net.minecraft.util.ActionResult;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.registry.CompostingChanceRegistry;
-import net.fabricmc.fabric.api.registry.FuelRegistry;
 import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 
 public class MounderTweaksMain implements ModInitializer {
@@ -29,6 +28,7 @@ public class MounderTweaksMain implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        Deserializer.initialize();
         // Compostable Poisonous Potatoes
         if (CONFIG.common.compostablePoisonousPotatoes) {
             CompostingChanceRegistry.INSTANCE.add(Items.POISONOUS_POTATO, 0.1f);
@@ -43,26 +43,26 @@ public class MounderTweaksMain implements ModInitializer {
             CompostingChanceRegistry.INSTANCE.add(Items.GRASS_BLOCK, 0.25f);
         }
 
-        // Shovel Grinding
-        if (CONFIG.common.shovelGrinding) {
-            ShovelPathHelper.getInstance().addNewPathPair(Blocks.COBBLESTONE, Blocks.GRAVEL.getDefaultState());
-            ShovelPathHelper.getInstance().addNewPathPair(Blocks.GRAVEL, Blocks.SAND.getDefaultState());
-        }
+//        // Shovel Grinding
+//        if (CONFIG.common.shovelGrinding) {
+//            ShovelPathHelper.getInstance().addNewPathPair(Blocks.COBBLESTONE, Blocks.GRAVEL.getDefaultState());
+//            ShovelPathHelper.getInstance().addNewPathPair(Blocks.GRAVEL, Blocks.SAND.getDefaultState());
+//        }
 
-        // Dirt To Path
-        if (CONFIG.common.dirtToPath) {
-            ShovelPathHelper.getInstance().addNewPathPair(Blocks.DIRT, Blocks.GRASS_PATH.getDefaultState());
-        }
+//        // Dirt To Path
+//        if (CONFIG.common.dirtToPath) {
+//            ShovelPathHelper.getInstance().addNewPathPair(Blocks.DIRT, Blocks.GRASS_PATH.getDefaultState());
+//        }
 
-        // Explosive Smelting
-        if (CONFIG.common.explosiveFuel) {
-            FuelRegistry.INSTANCE.add(Items.GUNPOWDER, 1200);
-        }
+//        // Explosive Smelting
+//        if (CONFIG.common.explosiveFuel) {
+//            FuelRegistry.INSTANCE.add(Items.GUNPOWDER, 1200);
+//        }
 
-        // Fiery Smelting
-        if (CONFIG.common.fieryFuel) {
-            FuelRegistry.INSTANCE.add(Items.BLAZE_POWDER, 1200);
-        }
+//        // Fiery Smelting
+//        if (CONFIG.common.fieryFuel) {
+//            FuelRegistry.INSTANCE.add(Items.BLAZE_POWDER, 1200);
+//        }
 
         UseBlockCallback.EVENT.register(((playerEntity, world, hand, blockHitResult) -> {
             ActionResult result = ActionResult.PASS;
@@ -73,14 +73,12 @@ public class MounderTweaksMain implements ModInitializer {
                 if (MounderTweaksMain.CONFIG.common.lampToggle) {
                     if (heldItem == Items.REDSTONE_TORCH && usedBlock == Blocks.REDSTONE_LAMP) {
                         world.setBlockState(blockHitResult.getBlockPos(), usedBlock.getDefaultState().with(RedstoneLampBlock.LIT, !usedBlockState.get(RedstoneLampBlock.LIT)));
-                        result = ActionResult.SUCCESS;
                     }
                 }
                 if (MounderTweaksMain.CONFIG.common.harvestablePots) {
                     if (heldItem.isIn(FabricToolTags.SHOVELS) && usedBlock instanceof FlowerPotBlock && usedBlock != Blocks.FLOWER_POT) {
                         world.setBlockState(blockHitResult.getBlockPos(), Blocks.FLOWER_POT.getDefaultState());
                         EntityType.ITEM.spawn((ServerWorld) world, null, null, null, blockHitResult.getBlockPos(), SpawnReason.EVENT, false, false);
-                        result = ActionResult.SUCCESS;
                     }
                 }
             }
