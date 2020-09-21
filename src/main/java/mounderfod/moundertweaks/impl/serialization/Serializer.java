@@ -34,20 +34,9 @@ public final class Serializer {
     }
 
     private static void writeDefaultValues() throws IOException {
-        Fuel fuel = new Fuel(ImmutableMap.of(
-                Items.GUNPOWDER, 1200,
-                Items.BLAZE_POWDER, 1200
-        ));
-        ShovelPath path = new ShovelPath(
-                ImmutableMap.of(
-                        Blocks.DIRT, Blocks.GRASS_PATH.getDefaultState(),
-                        Blocks.COBBLESTONE, Blocks.GRAVEL.getDefaultState(),
-                        Blocks.GRAVEL, Blocks.SAND.getDefaultState()
-                )
-        );
         CompoundTag all = new CompoundTag();
-        CompoundTag fuelTag = (CompoundTag) Fuel.CODEC.encodeStart(NbtOps.INSTANCE, fuel).getOrThrow(false, STDERR);
-        CompoundTag pathTag = (CompoundTag) ShovelPath.CODEC.encodeStart(NbtOps.INSTANCE, path).getOrThrow(false, STDERR);
+        CompoundTag fuelTag = (CompoundTag) Fuel.CODEC.encodeStart(NbtOps.INSTANCE, Fuel.getDefault()).getOrThrow(false, STDERR);
+        CompoundTag pathTag = (CompoundTag) ShovelPath.CODEC.encodeStart(NbtOps.INSTANCE, ShovelPath.getDefault()).getOrThrow(false, STDERR);
         all.put("fuel", fuelTag.get("fuel"));
         all.put("shovel_path", pathTag.get("shovel_path"));
         NbtIo.writeCompressed(all, DATA_CONFIG.toFile());

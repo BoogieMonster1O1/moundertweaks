@@ -33,18 +33,27 @@ public final class Deserializer {
         initialized = true;
         try {
             CompoundTag all = NbtIo.readCompressed(DATA_CONFIG.toFile());
-            Fuel fuel = Fuel.CODEC.decode(NbtOps.INSTANCE, all).getOrThrow(false, STDERR).getFirst();
-            ShovelPath path = ShovelPath.CODEC.decode(NbtOps.INSTANCE, all).getOrThrow(false, STDERR).getFirst();
-            for (Map.Entry<Block, BlockState> e : path.getMap().entrySet()) {
-                Block block = e.getKey();
-                BlockState blockState = e.getValue();
-                ShovelPathHelper.getInstance().addNewPathPair(block, blockState);
+            if (all.contains("fuel")) {
+                Fuel fuel = Fuel.CODEC.decode(NbtOps.INSTANCE, all).getOrThrow(false, STDERR).getFirst();
+                for (Map.Entry<Item, Integer> entry : fuel.getMap().entrySet()) {
+                    Item item = entry.getKey();
+                    Integer time = entry.getValue();
+                    FuelRegistry.INSTANCE.add(item, time);
+                }
+            } else {
+                all.put("fuel", (CompoundTag) Fuel.CODEC.encodeStart(NbtOps.INSTANCE, Fuel.getDefault()).getOrThrow(false, STDERR));
             }
-            for (Map.Entry<Item, Integer> entry : fuel.getMap().entrySet()) {
-                Item item = entry.getKey();
-                Integer time = entry.getValue();
-                FuelRegistry.INSTANCE.add(item, time);
+            if (all.contains("shovel_path")) {
+                ShovelPath path = ShovelPath.CODEC.decode(NbtOps.INSTANCE, all).getOrThrow(false, STDERR).getFirst();
+                for (Map.Entry<Block, BlockState> e : path.getMap().entrySet()) {
+                    Block block = e.getKey();
+                    BlockState blockState = e.getValue();
+                    ShovelPathHelper.getInstance().addNewPathPair(block, blockState);
+                }
+            } else {
+                all.put("shovel_path", (CompoundTag) ShovelPath.CODEC.encodeStart(NbtOps.INSTANCE, ShovelPath.getDefault()).getOrThrow(false, STDERR));
             }
+            NbtIo.writeCompressed(all, DATA_CONFIG.toFile());
         } catch (IOException e) {
             e.printStackTrace();
         }
