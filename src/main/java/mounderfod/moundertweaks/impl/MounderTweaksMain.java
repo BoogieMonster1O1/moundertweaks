@@ -43,27 +43,6 @@ public class MounderTweaksMain implements ModInitializer {
             CompostingChanceRegistry.INSTANCE.add(Items.GRASS_BLOCK, 0.25f);
         }
 
-//        // Shovel Grinding
-//        if (CONFIG.common.shovelGrinding) {
-//            ShovelPathHelper.getInstance().addNewPathPair(Blocks.COBBLESTONE, Blocks.GRAVEL.getDefaultState());
-//            ShovelPathHelper.getInstance().addNewPathPair(Blocks.GRAVEL, Blocks.SAND.getDefaultState());
-//        }
-
-//        // Dirt To Path
-//        if (CONFIG.common.dirtToPath) {
-//            ShovelPathHelper.getInstance().addNewPathPair(Blocks.DIRT, Blocks.GRASS_PATH.getDefaultState());
-//        }
-
-//        // Explosive Smelting
-//        if (CONFIG.common.explosiveFuel) {
-//            FuelRegistry.INSTANCE.add(Items.GUNPOWDER, 1200);
-//        }
-
-//        // Fiery Smelting
-//        if (CONFIG.common.fieryFuel) {
-//            FuelRegistry.INSTANCE.add(Items.BLAZE_POWDER, 1200);
-//        }
-
         UseBlockCallback.EVENT.register(((playerEntity, world, hand, blockHitResult) -> {
             ActionResult result = ActionResult.PASS;
             BlockState usedBlockState = world.getBlockState(blockHitResult.getBlockPos());
