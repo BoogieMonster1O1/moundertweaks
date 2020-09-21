@@ -31,8 +31,8 @@ public final class Deserializer {
         Serializer.check();
         try {
             CompoundTag all = NbtIo.readCompressed(DATA_CONFIG.toFile());
-            if (all.contains("fuel")) {
-                all.put("fuel", Fuel.CODEC.encodeStart(NbtOps.INSTANCE, Fuel.getDefault()).getOrThrow(false, STDERR));
+            if (!all.contains("fuel")) {
+                all.put("fuel", ((CompoundTag) Fuel.CODEC.encodeStart(NbtOps.INSTANCE, Fuel.getDefault()).getOrThrow(false, STDERR)).get("fuel"));
             }
             Fuel fuel = Fuel.CODEC.decode(NbtOps.INSTANCE, all).getOrThrow(false, STDERR).getFirst();
             for (Map.Entry<Item, Integer> entry : fuel.getMap().entrySet()) {
@@ -42,7 +42,7 @@ public final class Deserializer {
             }
 
             if (!all.contains("shovel_path")) {
-                all.put("shovel_path", ShovelPath.CODEC.encodeStart(NbtOps.INSTANCE, ShovelPath.getDefault()).getOrThrow(false, STDERR));
+                all.put("shovel_path", ((CompoundTag) ShovelPath.CODEC.encodeStart(NbtOps.INSTANCE, ShovelPath.getDefault()).getOrThrow(false, STDERR)).get("shovel_path"));
             }
             ShovelPath path = ShovelPath.CODEC.decode(NbtOps.INSTANCE, all).getOrThrow(false, STDERR).getFirst();
             for (Map.Entry<Block, BlockState> e : path.getMap().entrySet()) {
@@ -52,7 +52,7 @@ public final class Deserializer {
             }
 
             if (!all.contains("composting")) {
-                all.put("composting", Composting.CODEC.encodeStart(NbtOps.INSTANCE, Composting.getDefault()).getOrThrow(false, STDERR));
+                all.put("composting", ((CompoundTag) Composting.CODEC.encodeStart(NbtOps.INSTANCE, Composting.getDefault()).getOrThrow(false, STDERR)).get("composting"));
             }
             Composting com = Composting.CODEC.decode(NbtOps.INSTANCE, all).getOrThrow(false, STDERR).getFirst();
             for (Map.Entry<Item, Float> e : com.getMap().entrySet()) {
