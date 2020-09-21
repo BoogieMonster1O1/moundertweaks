@@ -32,36 +32,33 @@ public final class Deserializer {
         try {
             CompoundTag all = NbtIo.readCompressed(DATA_CONFIG.toFile());
             if (all.contains("fuel")) {
-                Fuel fuel = Fuel.CODEC.decode(NbtOps.INSTANCE, all).getOrThrow(false, STDERR).getFirst();
-                for (Map.Entry<Item, Integer> entry : fuel.getMap().entrySet()) {
-                    Item item = entry.getKey();
-                    Integer time = entry.getValue();
-                    FuelRegistry.INSTANCE.add(item, time);
-                }
-            } else {
                 all.put("fuel", Fuel.CODEC.encodeStart(NbtOps.INSTANCE, Fuel.getDefault()).getOrThrow(false, STDERR));
             }
-
-            if (all.contains("shovel_path")) {
-                ShovelPath path = ShovelPath.CODEC.decode(NbtOps.INSTANCE, all).getOrThrow(false, STDERR).getFirst();
-                for (Map.Entry<Block, BlockState> e : path.getMap().entrySet()) {
-                    Block block = e.getKey();
-                    BlockState blockState = e.getValue();
-                    ShovelPathHelper.getInstance().addNewPathPair(block, blockState);
-                }
-            } else {
-                all.put("shovel_path", ShovelPath.CODEC.encodeStart(NbtOps.INSTANCE, ShovelPath.getDefault()).getOrThrow(false, STDERR));
+            Fuel fuel = Fuel.CODEC.decode(NbtOps.INSTANCE, all).getOrThrow(false, STDERR).getFirst();
+            for (Map.Entry<Item, Integer> entry : fuel.getMap().entrySet()) {
+                Item item = entry.getKey();
+                Integer time = entry.getValue();
+                FuelRegistry.INSTANCE.add(item, time);
             }
 
-            if (all.contains("composting")) {
-                Composting com = Composting.CODEC.decode(NbtOps.INSTANCE, all).getOrThrow(false, STDERR).getFirst();
-                for (Map.Entry<Item, Float> e : com.getMap().entrySet()) {
-                    Item item = e.getKey();
-                    Float chance = e.getValue();
-                    CompostingChanceRegistry.INSTANCE.add(item, chance);
-                }
-            } else {
+            if (!all.contains("shovel_path")) {
+                all.put("shovel_path", ShovelPath.CODEC.encodeStart(NbtOps.INSTANCE, ShovelPath.getDefault()).getOrThrow(false, STDERR));
+            }
+            ShovelPath path = ShovelPath.CODEC.decode(NbtOps.INSTANCE, all).getOrThrow(false, STDERR).getFirst();
+            for (Map.Entry<Block, BlockState> e : path.getMap().entrySet()) {
+                Block block = e.getKey();
+                BlockState blockState = e.getValue();
+                ShovelPathHelper.getInstance().addNewPathPair(block, blockState);
+            }
+
+            if (!all.contains("composting")) {
                 all.put("composting", Composting.CODEC.encodeStart(NbtOps.INSTANCE, Composting.getDefault()).getOrThrow(false, STDERR));
+            }
+            Composting com = Composting.CODEC.decode(NbtOps.INSTANCE, all).getOrThrow(false, STDERR).getFirst();
+            for (Map.Entry<Item, Float> e : com.getMap().entrySet()) {
+                Item item = e.getKey();
+                Float chance = e.getValue();
+                CompostingChanceRegistry.INSTANCE.add(item, chance);
             }
             NbtIo.writeCompressed(all, DATA_CONFIG.toFile());
         } catch (IOException e) {
