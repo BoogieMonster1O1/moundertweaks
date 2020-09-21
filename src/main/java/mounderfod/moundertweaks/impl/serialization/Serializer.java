@@ -5,10 +5,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Consumer;
 
-import com.google.common.collect.ImmutableMap;
-
-import net.minecraft.block.Blocks;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtOps;

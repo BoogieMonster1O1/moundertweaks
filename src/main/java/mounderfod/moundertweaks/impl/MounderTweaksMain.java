@@ -19,7 +19,6 @@ import net.minecraft.util.ActionResult;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
-import net.fabricmc.fabric.api.registry.CompostingChanceRegistry;
 import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 
 public class MounderTweaksMain implements ModInitializer {
@@ -28,20 +27,7 @@ public class MounderTweaksMain implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        Deserializer.initialize();
-        // Compostable Poisonous Potatoes
-        if (CONFIG.common.compostablePoisonousPotatoes) {
-            CompostingChanceRegistry.INSTANCE.add(Items.POISONOUS_POTATO, 0.1f);
-        }
-
-        // Compostable Dirt and Grass Blocks
-        if (CONFIG.common.compostableDirt) {
-            CompostingChanceRegistry.INSTANCE.add(Items.DIRT, 0.25f);
-        }
-
-        if (CONFIG.common.compostableGrass) {
-            CompostingChanceRegistry.INSTANCE.add(Items.GRASS_BLOCK, 0.25f);
-        }
+        Deserializer.run();
 
         UseBlockCallback.EVENT.register(((playerEntity, world, hand, blockHitResult) -> {
             ActionResult result = ActionResult.PASS;

@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import mounderfod.moundertweaks.impl.serialization.Composting;
 import mounderfod.moundertweaks.impl.serialization.Fuel;
 import mounderfod.moundertweaks.impl.serialization.Serializer;
 import mounderfod.moundertweaks.impl.serialization.ShovelPath;
@@ -17,20 +18,17 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtOps;
 
+import net.fabricmc.fabric.api.registry.CompostingChanceRegistry;
 import net.fabricmc.fabric.api.registry.FuelRegistry;
 import net.fabricmc.loader.api.FabricLoader;
 
 public final class Deserializer {
-    private static boolean initialized = false;
     private static final Consumer<String> STDERR = System.err::println;
     public static final Path DATA_CONFIG = FabricLoader.getInstance().getConfigDir().resolve("moundertweaks-data.dat");
 
-    public static void initialize() {
-        if (initialized) {
-            throw new IllegalStateException("Can't Initialize twice!");
-        }
+    // TODO: Don't hardcode these
+    public static void run() {
         Serializer.check();
-        initialized = true;
         try {
             CompoundTag all = NbtIo.readCompressed(DATA_CONFIG.toFile());
             if (all.contains("fuel")) {
@@ -41,8 +39,9 @@ public final class Deserializer {
                     FuelRegistry.INSTANCE.add(item, time);
                 }
             } else {
-                all.put("fuel", (CompoundTag) Fuel.CODEC.encodeStart(NbtOps.INSTANCE, Fuel.getDefault()).getOrThrow(false, STDERR));
+                all.put("fuel", Fuel.CODEC.encodeStart(NbtOps.INSTANCE, Fuel.getDefault()).getOrThrow(false, STDERR));
             }
+
             if (all.contains("shovel_path")) {
                 ShovelPath path = ShovelPath.CODEC.decode(NbtOps.INSTANCE, all).getOrThrow(false, STDERR).getFirst();
                 for (Map.Entry<Block, BlockState> e : path.getMap().entrySet()) {
@@ -51,15 +50,22 @@ public final class Deserializer {
                     ShovelPathHelper.getInstance().addNewPathPair(block, blockState);
                 }
             } else {
-                all.put("shovel_path", (CompoundTag) ShovelPath.CODEC.encodeStart(NbtOps.INSTANCE, ShovelPath.getDefault()).getOrThrow(false, STDERR));
+                all.put("shovel_path", ShovelPath.CODEC.encodeStart(NbtOps.INSTANCE, ShovelPath.getDefault()).getOrThrow(false, STDERR));
+            }
+
+            if (all.contains("composting")) {
+                Composting com = Composting.CODEC.decode(NbtOps.INSTANCE, all).getOrThrow(false, STDERR).getFirst();
+                for (Map.Entry<Item, Float> e : com.getMap().entrySet()) {
+                    Item item = e.getKey();
+                    Float chance = e.getValue();
+                    CompostingChanceRegistry.INSTANCE.add(item, chance);
+                }
+            } else {
+                all.put("composting", Composting.CODEC.encodeStart(NbtOps.INSTANCE, Composting.getDefault()).getOrThrow(false, STDERR));
             }
             NbtIo.writeCompressed(all, DATA_CONFIG.toFile());
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public static boolean isInitialized() {
-        return initialized;
     }
 }
